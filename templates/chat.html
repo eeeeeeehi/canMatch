@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>チャット</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+  <div class="page-header">
+   <div class="header-button-wrapper">
+    <button onclick="location.href='{{ url_for('search') }}'">ホームに戻る</button>
+      <button onclick="location.href='{{ url_for('login') }}'">ログアウト</button> 
+      <button onclick="location.href='{{ url_for('inbox') }}'">メッセージ</button> 
+      <button onclick="location.href='{{ url_for('register') }}'">新規登録</button> 
+   </div>
+ </div>
+<body>
+  <div class="container">
+    <div class="chat-container">
+      <!-- ヘッダー -->
+      <div class="chat-header">
+        <div class="name">
+          <span id="userName">demo</span>
+        </div>
+        <div class="finish">
+            <button id="finishButton">完了</button>
+        </div>
+      </div>
+
+      <!-- メッセージ表示エリア -->
+      <div class="chat-messages">
+        <div id="messageArea">
+          <!-- メッセージがここに表示 -->
+        </div>
+      </div>
+
+      <!-- 入力フォーム -->
+      <form class="chat-input" onsubmit="return false;">
+        <input id="messageInput" name="input" placeholder="メッセージを入力" autocomplete="off" autofocus>
+        <button id="sendButton" type="button">
+          <i class="fa fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+
+    <!--完了ボタン押下後のポップアップ-->
+    <div id="mask" class="hidden"></div>
+    <section id="modal" class="hidden">
+        <p>質問を終了しました！</p>
+    </section>
+  </div>
+
+  <script>
+  // URLからチャット相手のidを取得
+  const params = new URLSearchParams(window.location.search);
+  const userId = parseInt(params.get('user_id'), 10);
+  let toUserName = "";
+
+  fetch('{{ url_for("get_users") }}')
+    .then(res => res.json())
+    .then(users => {
+      // id一致をまず探す（idはstring or int型）
+      let user = users.find(u => u.id && parseInt(u.id) === userId);
+      // idで見つからなければ、pass.csvユーザー（id: None/undefined）でuser_idは使えないので、全ユーザー一覧からidの無い人には直接アクセスしない運用を推奨
+      if (!user) {
+        // パラメータに user_name を持たせている場合はここで探せる
+        const altName = params.get('user_name');
+        if (altName) {
+          user = users.find(u => u.名前 === altName || u.name === altName);
+        }
+      }
+      const nameSpan = document.getElementById('userName');
+      if (user) {
+        nameSpan.textContent = user.名前 || user.name;
+        toUserName = user.名前 || user.name;
+      } else {
+        nameSpan.textContent = "不明なユーザー";
+      }
+    })
+    .catch(err => {
+      document.getElementById('userName').textContent = "取得エラー";
+    });
+</script>
+
+  <script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>
