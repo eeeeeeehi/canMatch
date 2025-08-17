@@ -2,6 +2,9 @@
 
 **大学生向けの学習支援マッチングアプリ**
 
+
+<img width="400" height="450" alt="image" src="https://github.com/user-attachments/assets/7db5a259-870a-4672-9185-6a1c4c7618a2" />
+
 ---
 
 ## 🎯 概要・目的
@@ -60,4 +63,5 @@
 
 ---
  
+
 
